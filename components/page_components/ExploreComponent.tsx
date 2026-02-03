@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import Image from "next/image";
 import { Icon } from "@iconify/react";
+import { motion } from "framer-motion";
 
 export default function ExploreComponent() {
   const houseHold = [
@@ -39,104 +42,233 @@ export default function ExploreComponent() {
     },
   ];
 
+  // Animation variants
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const scaleIn = {
+    hidden: { opacity: 0, scale: 0.9 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { duration: 0.5, ease: "easeOut" }
+    }
+  };
+
+  const slideInLeft = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  };
+
+  const slideInRight = {
+    hidden: { opacity: 0, x: 50 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: { duration: 0.6, ease: "easeOut" }
+    }
+  };
+
   return (
-    <section className="w-full overflow-hidden">
-      <h1 className="text-center text-3xl py-10">EXPLORE</h1>
-      <div className="flex flex-col md:gap-40">
-        <div className="block h-[50vh] md:h-[60vh] md:grid grid-cols-6 gap-6">
-          <div className="relative col-span-2">
+    <section className="w-full overflow-hidden py-10">
+      <motion.h1 
+        className="text-center text-3xl py-10"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.3 }}
+        variants={fadeInUp}
+      >
+        EXPLORE
+      </motion.h1>
+
+      <div className="flex flex-col gap-10 md:gap-40">
+        {/* Household Essentials Section */}
+        <div className="flex flex-col md:grid md:grid-cols-6 gap-6">
+          {/* Large Image - Hidden on mobile */}
+          <motion.div 
+            className="hidden md:block relative col-span-2 h-[60vh]"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={slideInLeft}
+          >
             <Image
               src={"/images/household.jpg"}
-              alt={"shoppingcart"}
+              alt={"household"}
               fill
               priority
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-(--red)/30 hover:bg-(--green)/30 " />
-          </div>
-          <div className="col-span-4">
-            <div className="flex flex-col h-full gap-10">
-              <div className="flex px-4 py-6 md:py-8 md:px-20 justify-between items-center">
-                <div>
-                  <h1 className="text-2xl">HouseHold Essentials</h1>
-                </div>
+            <motion.div 
+              className="absolute inset-0 bg-(--red)/30"
+              whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.div>
 
-                <div className="flex justify-end items-end">
+          {/* Content Section */}
+          <motion.div 
+            className="col-span-4"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeInUp}
+          >
+            <div className="flex flex-col h-full gap-6 md:gap-10">
+              {/* Header */}
+              <div className="flex px-4 py-6 md:py-8 md:px-20 justify-between items-center">
+                <motion.div variants={fadeInUp}>
+                  <h1 className="text-xl md:text-2xl">Household Essentials</h1>
+                </motion.div>
+
+                <motion.div 
+                  className="flex justify-end items-end"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <Icon
                     icon={"ep:arrow-right"}
                     width="24"
                     height="24"
                     className="text-(--red)"
                   />
-                </div>
+                </motion.div>
               </div>
 
-              {/* bottom grid */}
-
-              <div className="grid h-full grid-cols-2 md:grid-cols-3 gap-4 w-full">
+              {/* Product Grid */}
+              <motion.div 
+                className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 md:px-0"
+                variants={staggerContainer}
+              >
                 {houseHold.map((house) => (
-                  <div key={house.id} className="flex justify-center relative">
+                  <motion.div 
+                    key={house.id} 
+                    className="relative h-40 md:h-48 overflow-hidden rounded-md"
+                    variants={scaleIn}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <Image
                       src={house.image}
                       alt={house.name}
-                      width={600}
-                      height={600}
-                      className="w-full h-full object-fill rounded-md"
+                      fill
+                      className="object-cover rounded-md"
                     />
-                    <div className="absolute inset-0 bg-(--red)/30 hover:bg-(--green)/30 " />
-                  </div>
+                    <motion.div 
+                      className="absolute inset-0 bg-(--red)/30"
+                      whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         </div>
 
-        <div className="block h-[50vh] md:h-[60vh] md:grid grid-cols-6 gap-6">
-          <div className="col-span-4">
-            <div className="flex flex-col h-full gap-10">
+        {/* Oriflame Products Section */}
+        <div className="flex flex-col md:grid md:grid-cols-6 gap-6">
+          {/* Content Section - Order changed for mobile */}
+          <motion.div 
+            className="col-span-4 order-2 md:order-1"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={fadeInUp}
+          >
+            <div className="flex flex-col h-full gap-6 md:gap-10">
+              {/* Header */}
               <div className="flex px-4 py-6 md:py-8 md:px-20 justify-between items-center">
-                <div>
-                  <h1 className="text-2xl">Oriflame Products</h1>
-                </div>
+                <motion.div variants={fadeInUp}>
+                  <h1 className="text-xl md:text-2xl">Oriflame Products</h1>
+                </motion.div>
 
-                <div className="flex justify-end items-end">
+                <motion.div 
+                  className="flex justify-end items-end"
+                  whileHover={{ x: 5 }}
+                  transition={{ duration: 0.2 }}
+                >
                   <Icon
                     icon={"ep:arrow-right"}
                     width="24"
                     height="24"
                     className="text-(--red)"
                   />
-                </div>
+                </motion.div>
               </div>
 
-              {/* bottom grid */}
-              <div className="grid h-full grid-cols-2 md:grid-cols-3 gap-4 w-full">
+              {/* Product Grid */}
+              <motion.div 
+                className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 md:px-0"
+                variants={staggerContainer}
+              >
                 {skinCare.map((skin) => (
-                  <div key={skin.id} className="flex justify-center relative">
+                  <motion.div 
+                    key={skin.id} 
+                    className="relative h-40 md:h-48 overflow-hidden rounded-md"
+                    variants={scaleIn}
+                    whileHover={{ scale: 1.05 }}
+                    transition={{ duration: 0.3 }}
+                  >
                     <Image
                       src={skin.image}
                       alt={skin.name}
-                      width={600}
-                      height={600}
-                      className="w-full h-full object-cover rounded-md"
+                      fill
+                      className="object-cover rounded-md"
                     />
-                    <div className="absolute inset-0 bg-(--red)/30 hover:bg-(--green)/30 " />
-                  </div>
+                    <motion.div 
+                      className="absolute inset-0 bg-(--red)/30"
+                      whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="relative col-span-2">
+          {/* Large Image - Hidden on mobile */}
+          <motion.div 
+            className="hidden md:block relative col-span-2 h-[60vh] order-1 md:order-2"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={slideInRight}
+          >
             <Image
               src={"/images/oriflame1.png"}
-              alt={"shoppingcart"}
+              alt={"oriflame"}
               fill
               priority
               className="object-cover"
             />
-            <div className="absolute inset-0 bg-(--red)/30 hover:bg-(--green)/30 " />
-          </div>
+            <motion.div 
+              className="absolute inset-0 bg-(--red)/30"
+              whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.div>
         </div>
       </div>
     </section>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Red_Rose, Aboreto } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/components/navigation/Navbar";
+import Footer from "@/components/navigation/Footer";
 
 const redrose = Red_Rose({
   subsets: ["latin"],
@@ -26,7 +28,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${redrose.variable} ${aboreto.variable}  antialiased`}>{children}</body>
+      <body className={`${redrose.variable} ${aboreto.variable}  antialiased`}>
+        <Navbar/>
+        {children}
+        <Footer/>
+        </body>
     </html>
   );
 }

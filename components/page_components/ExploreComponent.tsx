@@ -50,7 +50,7 @@ export default function ExploreComponent() {
       y: 0,
       transition: { duration: 0.6, ease: "easeOut" }
     }
-  };
+  } as const
 
   const staggerContainer = {
     hidden: { opacity: 0 },
@@ -61,7 +61,7 @@ export default function ExploreComponent() {
         delayChildren: 0.1
       }
     }
-  };
+  } as const
 
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.9 },
@@ -70,7 +70,7 @@ export default function ExploreComponent() {
       scale: 1,
       transition: { duration: 0.5, ease: "easeOut" }
     }
-  };
+  } as const
 
   const slideInLeft = {
     hidden: { opacity: 0, x: -50 },
@@ -79,7 +79,7 @@ export default function ExploreComponent() {
       x: 0,
       transition: { duration: 0.6, ease: "easeOut" }
     }
-  };
+  } as const
 
   const slideInRight = {
     hidden: { opacity: 0, x: 50 },
@@ -88,7 +88,7 @@ export default function ExploreComponent() {
       x: 0,
       transition: { duration: 0.6, ease: "easeOut" }
     }
-  };
+  } as const
 
   return (
     <section className="w-full overflow-hidden py-10">

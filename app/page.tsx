@@ -66,7 +66,7 @@ export default function Home() {
       },
       y: 0,
     },
-  };
+  } as const
 
   const fadeIn = {
     hidden: {
@@ -78,7 +78,7 @@ export default function Home() {
         duration: 0.8,
       },
     },
-  };
+  } as const
 
   const staggerContainer = {
     hidden: {
@@ -91,7 +91,7 @@ export default function Home() {
         delayChildren: 0.2,
       },
     },
-  };
+  }as const
 
   const staleIn = {
     hidden: {
@@ -106,7 +106,7 @@ export default function Home() {
       },
       scale: 1,
     },
-  };
+  } as const
 
   const slideInLeft = {
     hidden: { opacity: 0, x: -100 },
@@ -115,7 +115,7 @@ export default function Home() {
       x: 0,
       transition: { duration: 0.6, ease: "easeOut" },
     },
-  };
+  } as const
 
   const slideInRight = {
     hidden: {
@@ -130,7 +130,7 @@ export default function Home() {
       },
       x: 0,
     },
-  };
+  } as const
 
   return (
     <div className="flex min-h-screen text-(--red)  w-screen bg-(--cream) font-aboreto">

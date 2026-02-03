@@ -66,7 +66,7 @@ export default function Home() {
       },
       y: 0,
     },
-  } as const
+  } as const;
 
   const fadeIn = {
     hidden: {
@@ -78,7 +78,7 @@ export default function Home() {
         duration: 0.8,
       },
     },
-  } as const
+  } as const;
 
   const staggerContainer = {
     hidden: {
@@ -91,7 +91,7 @@ export default function Home() {
         delayChildren: 0.2,
       },
     },
-  }as const
+  } as const;
 
   const staleIn = {
     hidden: {
@@ -106,7 +106,7 @@ export default function Home() {
       },
       scale: 1,
     },
-  } as const
+  } as const;
 
   const slideInLeft = {
     hidden: { opacity: 0, x: -100 },
@@ -115,7 +115,7 @@ export default function Home() {
       x: 0,
       transition: { duration: 0.6, ease: "easeOut" },
     },
-  } as const
+  } as const;
 
   const slideInRight = {
     hidden: {
@@ -130,7 +130,7 @@ export default function Home() {
       },
       x: 0,
     },
-  } as const
+  } as const;
 
   return (
     <div className="flex min-h-screen text-(--red)  w-screen bg-(--cream) font-aboreto">
@@ -155,6 +155,7 @@ export default function Home() {
               alt={"shoppingcart"}
               fill
               priority
+              loading="lazy"
               className="object-cover"
             />
             <div className="absolute inset-0 bg-(--red)/30" />
@@ -197,6 +198,7 @@ export default function Home() {
             className="relative"
           >
             <Image
+              loading="lazy"
               src={"/images/aisle.jpg"}
               alt={"aisle"}
               fill
@@ -259,6 +261,7 @@ export default function Home() {
                 className="relative hover:scale-100 w-28 h-28 rounded-full overflow-hidden bg-(--cream)"
               >
                 <Image
+                  loading="lazy"
                   src={product.image}
                   alt={product.name}
                   fill
@@ -295,6 +298,7 @@ export default function Home() {
                 className="relative hover:scale-100 w-15 h-15 rounded-full overflow-hidden bg-(--cream)"
               >
                 <Image
+                  loading="lazy"
                   src={product.image}
                   alt={product.name}
                   fill

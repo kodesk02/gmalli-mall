@@ -45,12 +45,12 @@ export default function ExploreComponent() {
   // Animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 40 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  } as const
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  } as const;
 
   const staggerContainer = {
     hidden: { opacity: 0 },
@@ -58,41 +58,41 @@ export default function ExploreComponent() {
       opacity: 1,
       transition: {
         staggerChildren: 0.15,
-        delayChildren: 0.1
-      }
-    }
-  } as const
+        delayChildren: 0.1,
+      },
+    },
+  } as const;
 
   const scaleIn = {
     hidden: { opacity: 0, scale: 0.9 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       scale: 1,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
-  } as const
+      transition: { duration: 0.5, ease: "easeOut" },
+    },
+  } as const;
 
   const slideInLeft = {
     hidden: { opacity: 0, x: -50 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       x: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  } as const
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  } as const;
 
   const slideInRight = {
     hidden: { opacity: 0, x: 50 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       x: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
-  } as const
+      transition: { duration: 0.6, ease: "easeOut" },
+    },
+  } as const;
 
   return (
     <section className="w-full overflow-hidden py-10">
-      <motion.h1 
+      <motion.h1
         className="text-center text-3xl py-10"
         initial="hidden"
         whileInView="visible"
@@ -106,7 +106,7 @@ export default function ExploreComponent() {
         {/* Household Essentials Section */}
         <div className="flex flex-col md:grid md:grid-cols-6 gap-6">
           {/* Large Image - Hidden on mobile */}
-          <motion.div 
+          <motion.div
             className="hidden md:block relative col-span-2 h-[60vh]"
             initial="hidden"
             whileInView="visible"
@@ -114,13 +114,14 @@ export default function ExploreComponent() {
             variants={slideInLeft}
           >
             <Image
+              loading="lazy"
               src={"/images/household.jpg"}
               alt={"household"}
               fill
               priority
               className="object-cover"
             />
-            <motion.div 
+            <motion.div
               className="absolute inset-0 bg-(--red)/30"
               whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
               transition={{ duration: 0.3 }}
@@ -128,7 +129,7 @@ export default function ExploreComponent() {
           </motion.div>
 
           {/* Content Section */}
-          <motion.div 
+          <motion.div
             className="col-span-4"
             initial="hidden"
             whileInView="visible"
@@ -142,7 +143,7 @@ export default function ExploreComponent() {
                   <h1 className="text-xl md:text-2xl">Household Essentials</h1>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   className="flex justify-end items-end"
                   whileHover={{ x: 5 }}
                   transition={{ duration: 0.2 }}
@@ -157,25 +158,26 @@ export default function ExploreComponent() {
               </div>
 
               {/* Product Grid */}
-              <motion.div 
+              <motion.div
                 className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 md:px-0"
                 variants={staggerContainer}
               >
                 {houseHold.map((house) => (
-                  <motion.div 
-                    key={house.id} 
+                  <motion.div
+                    key={house.id}
                     className="relative h-40 md:h-48 overflow-hidden rounded-md"
                     variants={scaleIn}
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.3 }}
                   >
                     <Image
+                      loading="lazy"
                       src={house.image}
                       alt={house.name}
                       fill
                       className="object-cover rounded-md"
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute inset-0 bg-(--red)/30"
                       whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
                       transition={{ duration: 0.3 }}
@@ -190,7 +192,7 @@ export default function ExploreComponent() {
         {/* Oriflame Products Section */}
         <div className="flex flex-col md:grid md:grid-cols-6 gap-6">
           {/* Content Section - Order changed for mobile */}
-          <motion.div 
+          <motion.div
             className="col-span-4 order-2 md:order-1"
             initial="hidden"
             whileInView="visible"
@@ -204,7 +206,7 @@ export default function ExploreComponent() {
                   <h1 className="text-xl md:text-2xl">Oriflame Products</h1>
                 </motion.div>
 
-                <motion.div 
+                <motion.div
                   className="flex justify-end items-end"
                   whileHover={{ x: 5 }}
                   transition={{ duration: 0.2 }}
@@ -219,25 +221,26 @@ export default function ExploreComponent() {
               </div>
 
               {/* Product Grid */}
-              <motion.div 
+              <motion.div
                 className="grid grid-cols-2 md:grid-cols-3 gap-4 px-4 md:px-0"
                 variants={staggerContainer}
               >
                 {skinCare.map((skin) => (
-                  <motion.div 
-                    key={skin.id} 
+                  <motion.div
+                    key={skin.id}
                     className="relative h-40 md:h-48 overflow-hidden rounded-md"
                     variants={scaleIn}
                     whileHover={{ scale: 1.05 }}
                     transition={{ duration: 0.3 }}
                   >
                     <Image
+                      loading="lazy"
                       src={skin.image}
                       alt={skin.name}
                       fill
                       className="object-cover rounded-md"
                     />
-                    <motion.div 
+                    <motion.div
                       className="absolute inset-0 bg-(--red)/30"
                       whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
                       transition={{ duration: 0.3 }}
@@ -249,7 +252,7 @@ export default function ExploreComponent() {
           </motion.div>
 
           {/* Large Image - Hidden on mobile */}
-          <motion.div 
+          <motion.div
             className="hidden md:block relative col-span-2 h-[60vh] order-1 md:order-2"
             initial="hidden"
             whileInView="visible"
@@ -257,13 +260,14 @@ export default function ExploreComponent() {
             variants={slideInRight}
           >
             <Image
+              loading="lazy"
               src={"/images/oriflame1.png"}
               alt={"oriflame"}
               fill
               priority
               className="object-cover"
             />
-            <motion.div 
+            <motion.div
               className="absolute inset-0 bg-(--red)/30"
               whileHover={{ backgroundColor: "rgba(0, 128, 0, 0.3)" }}
               transition={{ duration: 0.3 }}

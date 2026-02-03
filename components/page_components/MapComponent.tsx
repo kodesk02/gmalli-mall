@@ -14,6 +14,7 @@ export default function StoreHero() {
         src="/images/shoppingcart.jpg"
         alt="Gmailli Store"
         fill
+        loading="lazy"
         priority
         className={`object-cover transition-opacity duration-700 ${
           showMap ? "opacity-0" : "opacity-100"
@@ -25,6 +26,7 @@ export default function StoreHero() {
       <Image
         src="/images/go.png"
         alt="Store Map"
+        loading="lazy"
         fill
         className={`object-cover transition-opacity duration-700 ${
           showMap ? "opacity-100" : "opacity-0"

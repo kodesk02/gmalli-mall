@@ -114,7 +114,7 @@ export default function ExploreComponent() {
             variants={slideInLeft}
           >
             <Image
-              loading="lazy"
+              // loading="lazy"
               src={"/images/household.jpg"}
               alt={"household"}
               fill
@@ -260,7 +260,7 @@ export default function ExploreComponent() {
             variants={slideInRight}
           >
             <Image
-              loading="lazy"
+              // loading="lazy"
               src={"/images/oriflame1.png"}
               alt={"oriflame"}
               fill

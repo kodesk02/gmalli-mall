@@ -4,6 +4,7 @@ import Button from "@/components/buttons/Button";
 import ExploreComponent from "@/components/page_components/ExploreComponent";
 import StoreHero from "@/components/page_components/MapComponent";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
@@ -155,7 +156,6 @@ export default function Home() {
               alt={"shoppingcart"}
               fill
               priority
-              loading="lazy"
               className="object-cover"
             />
             <div className="absolute inset-0 bg-(--red)/30" />
@@ -182,9 +182,10 @@ export default function Home() {
                 <Button
                   variant="primary"
                   size="md"
+                  // Takes u to whatsapp 
                   onClick={() => router.push("/")}
                 >
-                  Shop Now
+                  Shop with us
                 </Button>
               </motion.div>
             </div>
@@ -238,6 +239,7 @@ export default function Home() {
           </div>
         </motion.div>
 
+        {/* Desktop product categories */}
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -251,31 +253,37 @@ export default function Home() {
               className="flex flex-col items-center gap-2"
               variants={staleIn}
             >
-              <motion.div
-                whileHover={{
-                  scale: 1.1,
-                  rotate: 5,
-                  transition: { duration: 0.3 },
-                }}
-                whileTap={{ scale: 0.95 }}
-                className="relative hover:scale-100 w-28 h-28 rounded-full overflow-hidden bg-(--cream)"
+              <Link
+                href={`/category/${encodeURIComponent(product.name)}`}
+                className="focus:outline-none focus-visible:ring-2 focus-visible:ring-(--red) rounded-full"
               >
-                <Image
-                  loading="lazy"
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-(--red)/30" />
-              </motion.div>
-              <div className="text-sm text-center ">
+                <motion.div
+                  whileHover={{
+                    scale: 1.1,
+                    rotate: 5,
+                    transition: { duration: 0.3 },
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative hover:scale-100 w-28 h-28 rounded-full overflow-hidden bg-(--cream) cursor-pointer"
+                >
+                  <Image
+                    loading="lazy"
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-(--red)/30 hover:bg-(--red)/10 transition-colors duration-300" />
+                </motion.div>
+              </Link>
+              <div className="text-sm text-center">
                 <span>{product.name}</span>
               </div>
             </motion.div>
           ))}
         </motion.div>
 
+        {/* Mobile product categories */}
         <motion.div
           initial="hidden"
           whileInView="visible"
@@ -289,24 +297,29 @@ export default function Home() {
               className="flex flex-col items-center gap-2"
               variants={staleIn}
             >
-              <motion.div
-                whileHover={{
-                  scale: 1.1,
-                  transition: { duration: 0.3 },
-                }}
-                whileTap={{ scale: 0.95 }}
-                className="relative hover:scale-100 w-15 h-15 rounded-full overflow-hidden bg-(--cream)"
+              <Link
+                href={`/category/${encodeURIComponent(product.name)}`}
+                className="focus:outline-none focus-visible:ring-2 focus-visible:ring-(--cream) rounded-full"
               >
-                <Image
-                  loading="lazy"
-                  src={product.image}
-                  alt={product.name}
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-(--red)/30" />
-              </motion.div>
-              <div className="text-sm text-center ">
+                <motion.div
+                  whileHover={{
+                    scale: 1.1,
+                    transition: { duration: 0.3 },
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative hover:scale-100 w-15 h-15 rounded-full overflow-hidden bg-(--cream) cursor-pointer"
+                >
+                  <Image
+                    loading="lazy"
+                    src={product.image}
+                    alt={product.name}
+                    fill
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-(--red)/30 hover:bg-(--red)/10 transition-colors duration-300" />
+                </motion.div>
+              </Link>
+              <div className="text-sm text-center">
                 <span>{product.name}</span>
               </div>
             </motion.div>

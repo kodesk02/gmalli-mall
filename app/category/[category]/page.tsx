@@ -3,12 +3,10 @@
 import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowLeft,
-  // Star, ShoppingCart,
-  PackageX,
-} from "lucide-react";
+import { motion, AnimatePresence, Variants } from "framer-motion";
+import { ArrowLeft,
+  //  Star, ShoppingCart,
+    PackageX } from "lucide-react";
 import CategoryFilter, {
   FilterState,
 } from "@/components/page_components/CategoryFilter";
@@ -30,7 +28,7 @@ export default function CategoryPage() {
   const products = useMemo(() => getProductsByCategory(category), [category]);
   const filterOptions = useMemo(
     () => getFilterOptionsForCategory(category),
-    [category],
+    [category]
   );
 
   const [activeFilters, setActiveFilters] = useState<FilterState>({
@@ -39,6 +37,7 @@ export default function CategoryPage() {
     priceRanges: [],
     inStockOnly: false,
   });
+
 
   const filteredProducts = useMemo(() => {
     return products.filter((p) => {
@@ -70,7 +69,7 @@ export default function CategoryPage() {
     },
   };
 
-  const cardVariants = {
+  const cardVariants: Variants = {
     hidden: { opacity: 0, y: 30, scale: 0.95 },
     visible: {
       opacity: 1,
@@ -182,12 +181,12 @@ function ProductCard({
   variants,
 }: {
   product: Product;
-  variants: object;
+  variants: Variants;
 }) {
   const priceRangeColors: Record<string, string> = {
     Low: "bg-green-100 text-green-700",
     Mid: "bg-amber-100 text-amber-700",
-    Sale: "bg-red-100 text-red-700",
+    High: "bg-red-100 text-red-700",
   };
 
   return (
@@ -196,7 +195,7 @@ function ProductCard({
       variants={variants}
       exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="group bg-backGround rounded-2xl overflow-hidden border-2 border-(--red)/10 hover:border-(--green)/40 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer"
+      className="group bg-white rounded-2xl overflow-hidden border-2 border-(--red)/10 hover:border-(--red)/40 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer"
     >
       {/* Image */}
       <div className="relative w-full aspect-square overflow-hidden bg-(--cream)">

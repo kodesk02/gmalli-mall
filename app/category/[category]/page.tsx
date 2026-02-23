@@ -195,7 +195,7 @@ function ProductCard({
       variants={variants}
       exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="group bg-white rounded-2xl overflow-hidden border-2 border-(--red)/10 hover:border-(--red)/40 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer"
+      className="group bg-backGround rounded-2xl overflow-hidden border-2 border-(--red)/10 hover:border-(--green)/40 shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col cursor-pointer"
     >
       {/* Image */}
       <div className="relative w-full aspect-square overflow-hidden bg-(--cream)">

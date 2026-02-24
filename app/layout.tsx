@@ -28,11 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${redrose.variable} ${aboreto.variable} bg-(--cream) antialiased`}>
-        <Navbar/>
-        {children}
-        <Footer/>
-        </body>
+      <body
+        className={`${redrose.variable} ${aboreto.variable} bg-(--cream) antialiased flex flex-col min-h-screen`}
+      >
+        <Navbar />
+        <div className="flex-1">{children}</div>
+        <Footer />
+      </body>
     </html>
   );
 }

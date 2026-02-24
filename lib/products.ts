@@ -503,3 +503,56 @@ export function getFilterOptionsForCategory(category: string) {
 
   return { brands, tags, priceRanges };
 }
+
+export const productCategories = [
+  { name: "Fresh Produce", image: "/images/pepper.jpg" },
+  { name: "Frozen Produce", image: "/images/frozenfood.jpg" },
+  { name: "Eggs", image: "/images/eggs.jpg" },
+  { name: "Clothing", image: "/images/clothing.jpg" },
+  { name: "Household Essentials", image: "/images/household.jpg" },
+  { name: "Skincare", image: "/images/skincare.jpg" },
+  { name: "Bodycare", image: "/images/bodycare.jpg" },
+  { name: "Haircare", image: "/images/haircare.jpg" },
+  { name: "Snacks", image: "/images/snacks.jpg" },
+  { name: "Kitchen Essentials", image: "/images/kitchenessentials.jpg" },
+];
+
+export const categories = [
+  "Fresh Produce",
+  "Frozen Produce",
+  "Eggs",
+  "Clothing",
+  "Household Essentials",
+  "Skincare",
+  "Bodycare",
+  "Haircare",
+  "Snacks",
+  "Kitchen Essentials",
+];
+
+export const ACTIVITIES = [
+  {
+    name: "Snooker",
+    description:
+      "Join us for a game of snooker every Friday evening at 7 PM. Whether you are a beginner or a pro, everyone is welcome to play and have fun!",
+    imageSrc: "/images/snooker.jpg",
+  },
+  {
+    name: "Arabian Tea",
+    description:
+      "Experience the rich flavors of our Carriabean Tea every Saturday morning at 10 AM. It’s the perfect way to start your weekend with a warm cup of tea and good company.",
+    imageSrc: "/images/arabian_tea.jpg",
+  },
+  {
+    name: "Table Tennis",
+    description:
+      "Get your heart pumping with our Table Tennis sessions every Wednesday at 6 PM. It’s a great way to stay active and have fun with friends!",
+    imageSrc: "/images/tabletennis.jpg",
+  },
+  {
+    name: "Point and Kill",
+    description:
+      "Join us for a thrilling game of Point and Kill every Sunday afternoon at 3 PM. It’s a fun way that everyone can enjoy our delicious catfish!",
+    imageSrc: "/images/catfish.jpg",
+  },
+];

@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${redrose.variable} ${aboreto.variable}  antialiased`}>
+      <body className={`${redrose.variable} ${aboreto.variable} bg-(--cream) antialiased`}>
         <Navbar/>
         {children}
         <Footer/>

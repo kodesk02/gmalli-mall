@@ -97,15 +97,15 @@ export default function CategoryFilter({
             style={{ fontFamily: "var(--font-red-rose)" }}
           >
             {/* Price Range */}
-            {filterOptions.priceRanges.length > 0 && (
+            {filterOptions?.priceRanges?.length > 0 && (
               <>
                 <DropdownMenuLabel className="text-(--red) font-bold text-xs uppercase tracking-wider px-2 py-1">
                   Price Range
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  {filterOptions.priceRanges.map((range) => (
+                  {filterOptions?.priceRanges?.map((range, i) => (
                     <DropdownMenuCheckboxItem
-                      key={range}
+                      key={i}
                       checked={activeFilters.priceRanges.includes(range)}
                       onCheckedChange={() => toggle("priceRanges", range)}
                       className="text-(--red) focus:bg-(--red)/10 focus:text-(--red) rounded-lg cursor-pointer"
@@ -119,15 +119,15 @@ export default function CategoryFilter({
             )}
 
             {/* Brands */}
-            {filterOptions.brands.length > 0 && (
+            {filterOptions?.brands?.length > 0 && (
               <>
                 <DropdownMenuLabel className="text-(--red) font-bold text-xs uppercase tracking-wider px-2 py-1">
                   Brand
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  {filterOptions.brands.map((brand) => (
+                  {filterOptions?.brands.map((brand, i) => (
                     <DropdownMenuCheckboxItem
-                      key={brand}
+                      key={i}
                       checked={activeFilters.brands.includes(brand)}
                       onCheckedChange={() => toggle("brands", brand)}
                       className="text-(--red) focus:bg-(--red)/10 focus:text-(--red) rounded-lg cursor-pointer"
@@ -141,13 +141,13 @@ export default function CategoryFilter({
             )}
 
             {/* Tags */}
-            {filterOptions.tags.length > 0 && (
+            {filterOptions?.tags?.length > 0 && (
               <>
                 <DropdownMenuLabel className="text-(--red) font-bold text-xs uppercase tracking-wider px-2 py-1">
                   Tags
                 </DropdownMenuLabel>
                 <DropdownMenuGroup>
-                  {filterOptions.tags.map((tag) => (
+                  {filterOptions?.tags.map((tag, i) => (
                     <DropdownMenuCheckboxItem
                       key={tag}
                       checked={activeFilters.tags.includes(tag)}

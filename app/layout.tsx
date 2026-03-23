@@ -3,6 +3,8 @@ import { Red_Rose, Aboreto } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
+import { CartProvider } from "@/context/CartContext";
+import CartDrawer from "@/components/cart/CartDrawer";
 
 const redrose = Red_Rose({
   subsets: ["latin"],
@@ -31,9 +33,14 @@ export default function RootLayout({
       <body
         className={`${redrose.variable} ${aboreto.variable} bg-(--cream) antialiased flex flex-col min-h-screen`}
       >
-        <Navbar />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        <CartProvider>
+          <Navbar />
+          <div className="flex-1">
+            {children}
+            <CartDrawer />
+          </div>
+          <Footer />
+        </CartProvider>
       </body>
     </html>
   );

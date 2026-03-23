@@ -1,8 +1,10 @@
+// components/Navbar.tsx
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,21 +12,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { categories } from "@/lib/products";
+import { useCart } from "@/context/CartContext";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
-
-  const navLinks = [
-    {
-      label: "Category",
-      path: "/products",
-    },
-    {
-      label: "Activities",
-      path: "/activity",
-    },
-  ];
+  const { totalItems, setIsCartOpen } = useCart();
 
   return (
     <nav
@@ -35,10 +28,12 @@ export default function Navbar() {
       className="text-xl text-(--red) font-light px-6 py-8"
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo */}
         <Link href={"/"}>
           <div className="font-bold text-xl">GMALLI</div>
         </Link>
 
+        {/* Desktop Navigation - Middle Section */}
         <div className="hidden md:flex gap-10 items-center">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -55,7 +50,7 @@ export default function Navbar() {
                 <DropdownMenuItem key={cat} asChild>
                   <Link
                     href={`/category/${encodeURIComponent(cat)}`}
-                    className="text-(--red) hover:bg-(--red)/80  rounded-lg px-3 py-2 text-sm font-medium cursor-pointer w-full"
+                    className="text-(--red) hover:bg-(--red)/10 rounded-lg px-3 py-2 text-sm font-medium cursor-pointer w-full block"
                   >
                     {cat}
                   </Link>
@@ -63,20 +58,54 @@ export default function Navbar() {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
           <Link className="hover:text-black transition-colors" href="/activity">
             Activities
           </Link>
-        </div>
 
-        {/* Links to whatsapp  */}
-        <div className="hidden md:flex">
-          <Link className="hover:text-black" href={"/"}>
+          {/* Contact Us - Moved to Middle */}
+          <Link className="hover:text-black transition-colors" href={"/"}>
             Contact Us
           </Link>
         </div>
 
+        {/* Desktop Right Section - Cart Icon */}
+        <div className="hidden md:flex items-center">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsCartOpen(true)}
+            className="relative p-2 text-(--red) hover:bg-(--red)/10 rounded-full transition-colors"
+          >
+            <ShoppingBag size={24} />
+            {totalItems > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 w-5 h-5 bg-(--red) text-(--cream) text-xs font-bold rounded-full flex items-center justify-center"
+              >
+                {totalItems > 9 ? "9+" : totalItems}
+              </motion.span>
+            )}
+          </motion.button>
+        </div>
+
         {/* Mobile Hamburger */}
-        <div className="md:hidden">
+        <div className="md:hidden flex items-center gap-4">
+          {/* Mobile Cart Icon */}
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setIsCartOpen(true)}
+            className="relative p-2 text-(--red)"
+          >
+            <ShoppingBag size={24} />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 w-5 h-5 bg-(--red) text-(--cream) text-xs font-bold rounded-full flex items-center justify-center">
+                {totalItems > 9 ? "9+" : totalItems}
+              </span>
+            )}
+          </motion.button>
+
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="focus:outline-none"
@@ -141,8 +170,10 @@ export default function Navbar() {
           >
             Activities
           </Link>
+          
+          {/* Contact Us in Mobile Menu */}
           <Link
-            className="hover:text-black"
+            className="hover:text-black transition-colors py-2"
             href={"/"}
             onClick={() => setIsOpen(false)}
           >

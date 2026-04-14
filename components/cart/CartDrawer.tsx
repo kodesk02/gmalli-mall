@@ -89,7 +89,7 @@ export default function CartDrawer() {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-(--red)/50 font-medium">{item.brand}</p>
                       <h3 className="text-sm font-bold text-(--red) truncate">{item.name}</h3>
-                      <p className="text-lg font-bold text-(--red) mt-1">N{item.price * item.quantity}</p>
+                      <p className="text-lg font-bold text-(--red) mt-1">N{(item.price * item.quantity).toFixed(2)}</p>
                       
                       <div className="flex items-center gap-3 mt-2">
                         <div className="flex items-center gap-2 bg-(--cream) rounded-lg border border-(--red)/20">

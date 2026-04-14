@@ -420,7 +420,7 @@ export default function CheckoutPage() {
                 {fulfillmentType === "walkin" && (
                   <div className="flex justify-between text-green-600 font-medium">
                     <span>Pickup Discount</span>
-                    <span>-N500</span>
+                    <span>-1</span>
                   </div>
                 )}
               </div>
@@ -432,7 +432,7 @@ export default function CheckoutPage() {
                     className="text-2xl font-bold text-(--red)"
                     style={{ fontFamily: "var(--font-aboreto)" }}
                   >
-                    N{(fulfillmentType === "walkin" ? total - 500 : total).toLocaleString()}
+                    N{(fulfillmentType === "walkin" ? total - 1 : total).toLocaleString()}
                   </span>
                 </div>
                 <p className="text-xs text-(--red)/40 mt-2">Including VAT where applicable</p>

@@ -86,7 +86,10 @@ export default function CategoryPage() {
     fetchFilterOptions();
   }, [category]);
 
-  const filteredProducts = useMemo(() => products, [products]);
+const filteredProducts = useMemo(
+  () => (Array.isArray(products) ? products : []),
+  [products]
+);
 
   const containerVariants = {
     hidden: { opacity: 0 },

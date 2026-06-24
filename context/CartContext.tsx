@@ -1,6 +1,14 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
+import Cookies from "js-cookie";
 
 export interface CartItem {
   id: string;
@@ -22,14 +30,88 @@ interface CartContextType {
   totalPrice: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
+  isLoading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+// -----------------------------------------------
+// Point to fast_server
+// -----------------------------------------------
+const API = process.env.NEXT_PUBLIC_API_URL;
+
+// -----------------------------------------------
+// Session ID — stored in a cookie for 7 days
+// -----------------------------------------------
+const getOrCreateSessionId = (): string => {
+  let sessionId = Cookies.get("gmalli_session");
+  if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    Cookies.set("gmalli_session", sessionId, { expires: 7 });
+  }
+  return sessionId;
+};
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const sessionId = useRef<string>("");
+  const hasLoaded = useRef(false);
 
+  // -----------------------------------------------
+  // On mount: get session, load cart from fast_server
+  // -----------------------------------------------
+  useEffect(() => {
+    sessionId.current = getOrCreateSessionId();
+
+    const loadCart = async () => {
+      try {
+        const res = await fetch(
+          `${API}/cart?sessionId=${sessionId.current}`  // ✅ fast_server
+        );
+        if (!res.ok) throw new Error("Failed to load cart");
+        const data = await res.json();
+        if (data.items?.length) setItems(data.items);
+      } catch (err) {
+        console.error("Cart load error:", err);
+      } finally {
+        hasLoaded.current = true;
+        setIsLoading(false);
+      }
+    };
+
+    loadCart();
+  }, []);
+
+  // -----------------------------------------------
+  // Save cart to fast_server whenever items change
+  // Debounced 500ms to avoid hammering the API
+  // -----------------------------------------------
+  useEffect(() => {
+    if (!hasLoaded.current) return;
+
+    const timeout = setTimeout(async () => {
+      try {
+        await fetch(
+          `${API}/cart?sessionId=${sessionId.current}`, // ✅ fast_server
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ items }),
+          }
+        );
+      } catch (err) {
+        console.error("Cart save error:", err);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [items]);
+
+  // -----------------------------------------------
+  // Cart actions
+  // -----------------------------------------------
   const addToCart = useCallback((product: Omit<CartItem, "quantity">) => {
     setItems((current) => {
       const existing = current.find((item) => item.id === product.id);
@@ -59,8 +141,16 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     );
   }, []);
 
-  const clearCart = useCallback(() => {
+  const clearCart = useCallback(async () => {
     setItems([]);
+    try {
+      await fetch(
+        `${API}/cart?sessionId=${sessionId.current}`, // ✅ fast_server
+        { method: "DELETE" }
+      );
+    } catch (err) {
+      console.error("Cart clear error:", err);
+    }
   }, []);
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -81,6 +171,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         totalPrice,
         isCartOpen,
         setIsCartOpen,
+        isLoading,
       }}
     >
       {children}

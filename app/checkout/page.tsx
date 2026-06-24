@@ -12,7 +12,8 @@ import {
   Truck, 
   ShieldCheck,
   ChevronRight,
-  Package
+  Package,
+  ScanQrCode
 } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
@@ -32,10 +33,17 @@ export default function CheckoutPage() {
     state: "",
     phone: "",
   });
+  const [pickupInfo, setPickupInfo] = useState({
+    first_name: "",
+    phoneNo: "",
+    emailAddress: "",
+  })
 
   const subtotal = totalPrice;
   const deliveryFee = fulfillmentType === "delivery" ? 2500 : 0;
   const total = subtotal + deliveryFee;
+
+  const disableFunct = !fulfillmentType || (fulfillmentType === "delivery" && (!deliveryAddress.street || !deliveryAddress.phone)) || (fulfillmentType === "walkin" && (!pickupInfo.first_name || !pickupInfo.phoneNo || !pickupInfo.emailAddress))
 
   if (items.length === 0) {
     return (
@@ -260,6 +268,42 @@ export default function CheckoutPage() {
                     </motion.div>
                   )}
 
+                    {fulfillmentType === "walkin" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      className="bg-white rounded-2xl p-6 border-2 border-(--red)/10 space-y-4"
+                    >
+                      <h3 className="font-bold text-(--red) flex items-center gap-2">
+                        <ScanQrCode size={18} />
+                        Pick-Up Information
+                      </h3>
+                      <div className="grid sm:grid-cols-1 gap-4">
+                        <input
+                          type="text"
+                          placeholder="First Name"
+                          value={pickupInfo.first_name}
+                          onChange={(e) => setPickupInfo({...pickupInfo, first_name: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Email Address"
+                          value={pickupInfo.emailAddress}
+                          onChange={(e) => setPickupInfo({...pickupInfo, emailAddress: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
+                        />
+                        <input
+                          type="tel"
+                          placeholder="Phone Number"
+                          value={pickupInfo.phoneNo}
+                          onChange={(e) => setPickupInfo({...pickupInfo, phoneNo: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
+                        />
+                      </div>
+                    </motion.div>
+                  )}
+
                   <div className="flex gap-4">
                     <button
                       onClick={() => setStep("review")}
@@ -271,7 +315,7 @@ export default function CheckoutPage() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setStep("payment")}
-                      disabled={!fulfillmentType || (fulfillmentType === "delivery" && (!deliveryAddress.street || !deliveryAddress.phone))}
+                      disabled={disableFunct}
                       className="flex-1 py-4 bg-(--red) text-(--cream) rounded-xl font-bold text-lg hover:bg-(--red)/90 transition-colors shadow-lg shadow-(--red)/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Continue to Payment
@@ -319,7 +363,7 @@ export default function CheckoutPage() {
                     </motion.button>
 
                     {/* Bank Transfer Option */}
-                    <motion.button
+                    {/* <motion.button
                       whileHover={{ scale: 1.01 }}
                       whileTap={{ scale: 0.99 }}
                       onClick={() => setPaymentMethod("transfer")}
@@ -341,7 +385,7 @@ export default function CheckoutPage() {
                       }`}>
                         {paymentMethod === "transfer" && <div className="w-3 h-3 rounded-full bg-white" />}
                       </div>
-                    </motion.button>
+                    </motion.button> */}
                   </div>
 
                   {paymentMethod === "transfer" && (

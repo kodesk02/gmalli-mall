@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { 
-  CheckCircle2, 
-  Copy, 
-  MapPin, 
-  Store, 
-  Truck, 
-  Clock, 
+import {
+  CheckCircle2,
+  Copy,
+  MapPin,
+  Store,
+  Truck,
+  Clock,
   Package,
   ArrowRight,
-  QrCode
+  QrCode,
 } from "lucide-react";
 import { getNextWeekDate } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
@@ -23,9 +23,12 @@ export function OrderSuccessContent() {
   const [copied, setCopied] = useState(false);
   const { clearCart } = useCart();
 
-  const type = searchParams.get("type") as "walkin" | "delivery";
-  const pickupCode = searchParams.get("code");
-  const orderId = searchParams.get("order");
+  const type = (searchParams?.get("type") ?? null) as
+    | "walkin"
+    | "delivery"
+    | null;
+  const pickupCode = searchParams?.get("code") ?? null;
+  const orderId = searchParams?.get("order") ?? null;
 
   useEffect(() => {
     if (!type) {
@@ -46,7 +49,10 @@ export function OrderSuccessContent() {
   if (!type) return null;
 
   return (
-    <div className="min-h-screen bg-(--cream) text-(--red) flex items-center justify-center p-4" style={{ fontFamily: "var(--font-red-rose)" }}>
+    <div
+      className="min-h-screen bg-(--cream) text-(--red) flex items-center justify-center p-4"
+      style={{ fontFamily: "var(--font-red-rose)" }}
+    >
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -63,7 +69,7 @@ export function OrderSuccessContent() {
         </motion.div>
 
         <div>
-          <h1 
+          <h1
             className="text-3xl font-bold text-(--red) mb-2"
             style={{ fontFamily: "var(--font-aboreto)" }}
           >
@@ -72,17 +78,20 @@ export function OrderSuccessContent() {
           <p className="text-(--red)/60">
             Thank you for your purchase. Your order has been confirmed.
           </p>
+          <p className="text-(--red)/60 text-xs mt-2">
+            *Kindly take a screenshot of this code for your records.*
+          </p>
         </div>
 
         {type === "walkin" ? (
           /* Walk-in Pickup Content */
           <div className="space-y-6">
-            <div className="bg-amber-50 rounded-2xl p-6 border-2 border-amber-200 space-y-4">
+            <div className="bg-amber-50 rounded-2xl border-2 p-6 border-amber-200 space-y-4">
               <div className="flex items-center justify-center gap-2 text-amber-800 font-bold mb-4">
                 <Store size={20} />
                 <span>Walk-in Pickup</span>
               </div>
-              
+
               <div className="space-y-2">
                 <p className="text-sm text-amber-700">Your Pickup Code</p>
                 <div className="flex items-center justify-center gap-3">
@@ -119,22 +128,22 @@ export function OrderSuccessContent() {
 
             <div className="space-y-3 text-left bg-(--cream) rounded-xl p-4">
               <div className="flex items-start gap-3">
-                <MapPin className="text-(--red) flex-shrink-0 mt-0.5" size={18} />
+                <MapPin className="text-(--red) shrink-0 mt-0.5" size={18} />
                 <div>
                   <p className="font-semibold text-(--red)">Pickup Location</p>
                   <p className="text-sm text-(--red)/60">
-                    123 Store Street, Lagos, Nigeria<br />
-                    Mon-Sat: 9AM - 6PM
+                    Oyo Owode Road, Ogbomosho Road, opposite MTN office, Owode,
+                    Ibadan 211172, Oyo
+                    <br />
+                    Mon-Sat: 9AM - 10PM
                   </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Clock className="text-(--red) flex-shrink-0 mt-0.5" size={18} />
+                <Clock className="text-(--red) shrink-0 mt-0.5" size={18} />
                 <div>
                   <p className="font-semibold text-(--red)">Valid Until</p>
-                  <p className="text-sm text-(--red)/60">
-                    {getNextWeekDate()}
-                  </p>
+                  <p className="text-sm text-(--red)/60">{getNextWeekDate()}</p>
                 </div>
               </div>
             </div>
@@ -162,7 +171,7 @@ export function OrderSuccessContent() {
               {/* Tracking Timeline */}
               <div className="space-y-4 mt-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="text-white" size={20} />
                   </div>
                   <div className="flex-1 text-left">
@@ -170,9 +179,9 @@ export function OrderSuccessContent() {
                     <p className="text-sm text-blue-600">Just now</p>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-blue-200 flex items-center justify-center shrink-0">
                     <Package className="text-blue-600" size={20} />
                   </div>
                   <div className="flex-1 text-left">
@@ -182,7 +191,7 @@ export function OrderSuccessContent() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                     <Truck className="text-blue-400" size={20} />
                   </div>
                   <div className="flex-1 text-left">
@@ -192,7 +201,7 @@ export function OrderSuccessContent() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
                     <MapPin className="text-blue-400" size={20} />
                   </div>
                   <div className="flex-1 text-left">
@@ -206,7 +215,8 @@ export function OrderSuccessContent() {
             <div className="bg-(--cream) rounded-xl p-4 text-left space-y-3">
               <p className="font-semibold text-(--red)">Delivery Updates</p>
               <p className="text-sm text-(--red)/60">
-                We&apos;ll send you SMS and email updates at each step. You can also track your order in real-time.
+                We&apos;ll send you SMS and email updates at each step. You can
+                also track your order in real-time.
               </p>
             </div>
 

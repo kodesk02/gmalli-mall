@@ -4,16 +4,16 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Store, 
-  CreditCard, 
-  Truck, 
+import {
+  ArrowLeft,
+  MapPin,
+  Store,
+  CreditCard,
+  Truck,
   ShieldCheck,
   ChevronRight,
   Package,
-  ScanQrCode
+  ScanQrCode,
 } from "lucide-react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
@@ -23,11 +23,14 @@ type PaymentMethod = "paystack" | "transfer" | null;
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, totalPrice, totalItems } = useCart();
-  const [step, setStep] = useState<"review" | "fulfillment" | "payment" | "processing">("review");
+  const { items, totalPrice, totalItems , clearCart} = useCart();
+  const [step, setStep] = useState<
+    "review" | "fulfillment" | "payment" | "processing"
+  >("review");
   const [fulfillmentType, setFulfillmentType] = useState<FulfillmentType>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(null);
   const [deliveryAddress, setDeliveryAddress] = useState({
+    first_name: "",
     street: "",
     city: "",
     state: "",
@@ -37,20 +40,30 @@ export default function CheckoutPage() {
     first_name: "",
     phoneNo: "",
     emailAddress: "",
-  })
+  });
 
   const subtotal = totalPrice;
   const deliveryFee = fulfillmentType === "delivery" ? 2500 : 0;
   const total = subtotal + deliveryFee;
 
-  const disableFunct = !fulfillmentType || (fulfillmentType === "delivery" && (!deliveryAddress.street || !deliveryAddress.phone)) || (fulfillmentType === "walkin" && (!pickupInfo.first_name || !pickupInfo.phoneNo || !pickupInfo.emailAddress))
+  const disableFunct =
+    !fulfillmentType ||
+    (fulfillmentType === "delivery" &&
+      (!deliveryAddress.street || !deliveryAddress.phone)) ||
+    (fulfillmentType === "walkin" &&
+      (!pickupInfo.first_name ||
+        !pickupInfo.phoneNo ||
+        !pickupInfo.emailAddress));
 
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-(--cream) flex items-center justify-center">
         <div className="text-center space-y-4">
           <Package size={64} className="text-(--red)/20 mx-auto" />
-          <h2 className="text-2xl font-bold text-(--red)" style={{ fontFamily: "var(--font-aboreto)" }}>
+          <h2
+            className="text-2xl font-bold text-(--red)"
+            style={{ fontFamily: "var(--font-aboreto)" }}
+          >
             Your cart is empty
           </h2>
           <button
@@ -66,18 +79,61 @@ export default function CheckoutPage() {
 
   const handlePayment = async () => {
     setStep("processing");
-    // Simulate Paystack integration
-    setTimeout(() => {
-      if (fulfillmentType === "walkin") {
-        router.push(`/checkout/success?type=walkin&code=${Math.random().toString(36).substring(2, 8).toUpperCase()}`);
-      } else {
-        router.push(`/checkout/success?type=delivery&order=${Math.random().toString(36).substring(2, 10).toUpperCase()}`);
+
+    try {
+      const orderBody = {
+        order_type: fulfillmentType === "walkin" ? "pickup" : "delivery",
+        customer_name:
+          fulfillmentType === "walkin"
+            ? pickupInfo.first_name
+            : deliveryAddress.first_name,
+        customer_email:
+          fulfillmentType === "walkin" ? pickupInfo.emailAddress : undefined,
+        customer_phone:
+          fulfillmentType === "walkin"
+            ? pickupInfo.phoneNo
+            : deliveryAddress.phone,
+        address:
+          fulfillmentType === "delivery" ? deliveryAddress.street : undefined,
+        city: fulfillmentType === "delivery" ? deliveryAddress.city : undefined,
+        state:
+          fulfillmentType === "delivery" ? deliveryAddress.state : undefined,
+        items: items.map((item) => ({
+          product_id: item.id,
+          quantity: item.quantity,
+        })),
+      };
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/initiate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(orderBody),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setStep("payment");
+        alert(data.error || "Something went wrong. Please try again.");
+        return;
       }
-    }, 2000);
+
+      clearCart();
+      window.location.href = data.payment_url;
+      // router.push(
+      //   `/checkout/success?type=${fulfillmentType}&code=${data.pickup_code}&name=${data.customer_name}&total=${data.total_price}`,
+      // );
+    } catch {
+      setStep("payment");
+      alert("Failed to place order. Please try again.");
+    }
   };
 
   return (
-    <div className="min-h-screen bg-(--cream) text-(--red)" style={{ fontFamily: "var(--font-red-rose)" }}>
+    <div
+      className="min-h-screen bg-(--cream) text-(--red)"
+      style={{ fontFamily: "var(--font-red-rose)" }}
+    >
       {/* Header */}
       <div className="sticky top-0 z-30 bg-(--cream) border-b-2 border-(--red)/10">
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-4">
@@ -91,22 +147,36 @@ export default function CheckoutPage() {
               <ArrowLeft size={20} />
               <span className="hidden sm:inline">Back</span>
             </motion.button>
-            
+
             <div className="h-6 w-px bg-(--red)/30" />
-            
+
             <div>
-              <h1 
+              <h1
                 className="text-2xl md:text-3xl font-bold text-(--red)"
                 style={{ fontFamily: "var(--font-aboreto)" }}
               >
                 Checkout
               </h1>
               <div className="flex items-center gap-2 text-sm text-(--red)/60 mt-1">
-                <span className={step === "review" ? "font-bold text-(--red)" : ""}>Review</span>
+                <span
+                  className={step === "review" ? "font-bold text-(--red)" : ""}
+                >
+                  Review
+                </span>
                 <ChevronRight size={14} />
-                <span className={step === "fulfillment" ? "font-bold text-(--red)" : ""}>Delivery</span>
+                <span
+                  className={
+                    step === "fulfillment" ? "font-bold text-(--red)" : ""
+                  }
+                >
+                  Delivery
+                </span>
                 <ChevronRight size={14} />
-                <span className={step === "payment" ? "font-bold text-(--red)" : ""}>Payment</span>
+                <span
+                  className={step === "payment" ? "font-bold text-(--red)" : ""}
+                >
+                  Payment
+                </span>
               </div>
             </div>
           </div>
@@ -126,10 +196,13 @@ export default function CheckoutPage() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <h2 className="text-xl font-bold text-(--red)" style={{ fontFamily: "var(--font-aboreto)" }}>
+                  <h2
+                    className="text-xl font-bold text-(--red)"
+                    style={{ fontFamily: "var(--font-aboreto)" }}
+                  >
                     Review Items ({totalItems})
                   </h2>
-                  
+
                   <div className="space-y-4">
                     {items.map((item) => (
                       <motion.div
@@ -138,15 +211,28 @@ export default function CheckoutPage() {
                         className="flex gap-4 bg-white rounded-xl p-4 border-2 border-(--red)/10"
                       >
                         <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-(--cream) flex-shrink-0">
-                          <Image src={item.image} alt={item.name} fill className="object-cover" />
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                          />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm text-(--red)/50 font-medium">{item.brand}</p>
-                          <h3 className="font-bold text-(--red)">{item.name}</h3>
-                          <p className="text-lg font-bold text-(--red) mt-2">N{item.price} × {item.quantity}</p>
+                          <p className="text-sm text-(--red)/50 font-medium">
+                            {item.brand}
+                          </p>
+                          <h3 className="font-bold text-(--red)">
+                            {item.name}
+                          </h3>
+                          <p className="text-lg font-bold text-(--red) mt-2">
+                            N{item.price} × {item.quantity}
+                          </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-xl font-bold text-(--red)">N{item.price * item.quantity}</p>
+                          <p className="text-xl font-bold text-(--red)">
+                            N{item.price * item.quantity}
+                          </p>
                         </div>
                       </motion.div>
                     ))}
@@ -171,7 +257,10 @@ export default function CheckoutPage() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <h2 className="text-xl font-bold text-(--red)" style={{ fontFamily: "var(--font-aboreto)" }}>
+                  <h2
+                    className="text-xl font-bold text-(--red)"
+                    style={{ fontFamily: "var(--font-aboreto)" }}
+                  >
                     Choose Fulfillment Method
                   </h2>
 
@@ -190,7 +279,9 @@ export default function CheckoutPage() {
                       <div className="w-12 h-12 rounded-full bg-(--red)/10 flex items-center justify-center mb-4">
                         <Store className="text-(--red)" size={24} />
                       </div>
-                      <h3 className="text-lg font-bold text-(--red) mb-2">Walk-in Pickup</h3>
+                      <h3 className="text-lg font-bold text-(--red) mb-2">
+                        Walk-in Pickup
+                      </h3>
                       <p className="text-sm text-(--red)/60 mb-4">
                         Pick up your order at our store. No delivery fee.
                       </p>
@@ -214,9 +305,12 @@ export default function CheckoutPage() {
                       <div className="w-12 h-12 rounded-full bg-(--red)/10 flex items-center justify-center mb-4">
                         <Truck className="text-(--red)" size={24} />
                       </div>
-                      <h3 className="text-lg font-bold text-(--red) mb-2">Home Delivery</h3>
+                      <h3 className="text-lg font-bold text-(--red) mb-2">
+                        Home Delivery
+                      </h3>
                       <p className="text-sm text-(--red)/60 mb-4">
-                        We&apos;ll deliver to your doorstep within 2-4 business days.
+                        We&apos;ll deliver to your doorstep within 2-4 business
+                        days.
                       </p>
                       <div className="flex items-center gap-2 text-(--red) font-semibold text-sm">
                         <MapPin size={16} />
@@ -235,40 +329,72 @@ export default function CheckoutPage() {
                         <MapPin size={18} />
                         Delivery Address
                       </h3>
+                      <input
+                        type="text"
+                        placeholder="First Name"
+                        value={deliveryAddress.first_name}
+                        onChange={(e) =>
+                          setDeliveryAddress({
+                            ...deliveryAddress,
+                            first_name: e.target.value,
+                          })
+                        }
+                        className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
+                      />
                       <div className="grid sm:grid-cols-2 gap-4">
                         <input
                           type="text"
                           placeholder="Street Address"
                           value={deliveryAddress.street}
-                          onChange={(e) => setDeliveryAddress({...deliveryAddress, street: e.target.value})}
+                          onChange={(e) =>
+                            setDeliveryAddress({
+                              ...deliveryAddress,
+                              street: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
                         />
                         <input
                           type="text"
                           placeholder="City"
                           value={deliveryAddress.city}
-                          onChange={(e) => setDeliveryAddress({...deliveryAddress, city: e.target.value})}
+                          onChange={(e) =>
+                            setDeliveryAddress({
+                              ...deliveryAddress,
+                              city: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
                         />
                         <input
                           type="text"
                           placeholder="State"
                           value={deliveryAddress.state}
-                          onChange={(e) => setDeliveryAddress({...deliveryAddress, state: e.target.value})}
+                          onChange={(e) =>
+                            setDeliveryAddress({
+                              ...deliveryAddress,
+                              state: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
                         />
                         <input
                           type="tel"
                           placeholder="Phone Number"
                           value={deliveryAddress.phone}
-                          onChange={(e) => setDeliveryAddress({...deliveryAddress, phone: e.target.value})}
+                          onChange={(e) =>
+                            setDeliveryAddress({
+                              ...deliveryAddress,
+                              phone: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
                         />
                       </div>
                     </motion.div>
                   )}
 
-                    {fulfillmentType === "walkin" && (
+                  {fulfillmentType === "walkin" && (
                     <motion.div
                       initial={{ opacity: 0, height: 0 }}
                       animate={{ opacity: 1, height: "auto" }}
@@ -283,21 +409,36 @@ export default function CheckoutPage() {
                           type="text"
                           placeholder="First Name"
                           value={pickupInfo.first_name}
-                          onChange={(e) => setPickupInfo({...pickupInfo, first_name: e.target.value})}
+                          onChange={(e) =>
+                            setPickupInfo({
+                              ...pickupInfo,
+                              first_name: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
                         />
                         <input
                           type="text"
                           placeholder="Email Address"
                           value={pickupInfo.emailAddress}
-                          onChange={(e) => setPickupInfo({...pickupInfo, emailAddress: e.target.value})}
+                          onChange={(e) =>
+                            setPickupInfo({
+                              ...pickupInfo,
+                              emailAddress: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
                         />
                         <input
                           type="tel"
                           placeholder="Phone Number"
                           value={pickupInfo.phoneNo}
-                          onChange={(e) => setPickupInfo({...pickupInfo, phoneNo: e.target.value})}
+                          onChange={(e) =>
+                            setPickupInfo({
+                              ...pickupInfo,
+                              phoneNo: e.target.value,
+                            })
+                          }
                           className="w-full px-4 py-3 rounded-xl border-2 border-(--red)/20 focus:border-(--red) outline-none bg-(--cream) text-(--red) placeholder:text-(--red)/40"
                         />
                       </div>
@@ -332,7 +473,10 @@ export default function CheckoutPage() {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <h2 className="text-xl font-bold text-(--red)" style={{ fontFamily: "var(--font-aboreto)" }}>
+                  <h2
+                    className="text-xl font-bold text-(--red)"
+                    style={{ fontFamily: "var(--font-aboreto)" }}
+                  >
                     Payment Method
                   </h2>
 
@@ -352,13 +496,23 @@ export default function CheckoutPage() {
                         <CreditCard className="text-blue-600" size={28} />
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-lg font-bold text-(--red)">Pay with Paystack</h3>
-                        <p className="text-sm text-(--red)/60">Card, Bank Transfer, USSD, or Mobile Money</p>
+                        <h3 className="text-lg font-bold text-(--red)">
+                          Pay with Paystack
+                        </h3>
+                        <p className="text-sm text-(--red)/60">
+                          Card, Bank Transfer, USSD, or Mobile Money
+                        </p>
                       </div>
-                      <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                        paymentMethod === "paystack" ? "border-(--red) bg-(--red)" : "border-(--red)/30"
-                      }`}>
-                        {paymentMethod === "paystack" && <div className="w-3 h-3 rounded-full bg-white" />}
+                      <div
+                        className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
+                          paymentMethod === "paystack"
+                            ? "border-(--red) bg-(--red)"
+                            : "border-(--red)/30"
+                        }`}
+                      >
+                        {paymentMethod === "paystack" && (
+                          <div className="w-3 h-3 rounded-full bg-white" />
+                        )}
                       </div>
                     </motion.button>
 
@@ -394,14 +548,26 @@ export default function CheckoutPage() {
                       animate={{ opacity: 1, height: "auto" }}
                       className="bg-amber-50 rounded-2xl p-6 border-2 border-amber-200 space-y-3"
                     >
-                      <h3 className="font-bold text-amber-800">Bank Account Details</h3>
+                      <h3 className="font-bold text-amber-800">
+                        Bank Account Details
+                      </h3>
                       <div className="space-y-2 text-amber-900">
-                        <p><span className="font-semibold">Bank:</span> First Bank of Nigeria</p>
-                        <p><span className="font-semibold">Account Number:</span> 0123456789</p>
-                        <p><span className="font-semibold">Account Name:</span> Your Store Name Ltd</p>
+                        <p>
+                          <span className="font-semibold">Bank:</span> First
+                          Bank of Nigeria
+                        </p>
+                        <p>
+                          <span className="font-semibold">Account Number:</span>{" "}
+                          0123456789
+                        </p>
+                        <p>
+                          <span className="font-semibold">Account Name:</span>{" "}
+                          Your Store Name Ltd
+                        </p>
                       </div>
                       <p className="text-sm text-amber-700 mt-4">
-                        Please use your order ID as reference. Your order will be processed after payment confirmation.
+                        Please use your order ID as reference. Your order will
+                        be processed after payment confirmation.
                       </p>
                     </motion.div>
                   )}
@@ -421,7 +587,9 @@ export default function CheckoutPage() {
                       className="flex-1 py-4 bg-(--red) text-(--cream) rounded-xl font-bold text-lg hover:bg-(--red)/90 transition-colors shadow-lg shadow-(--red)/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       <CreditCard size={20} />
-                      {paymentMethod === "transfer" ? "I've Made the Transfer" : "Pay Now"}
+                      {paymentMethod === "transfer"
+                        ? "I've Made the Transfer"
+                        : "Pay Now"}
                     </motion.button>
                   </div>
                 </motion.div>
@@ -435,8 +603,12 @@ export default function CheckoutPage() {
                   className="flex flex-col items-center justify-center py-24 space-y-6"
                 >
                   <div className="w-16 h-16 border-4 border-(--red)/20 border-t-(--red) rounded-full animate-spin" />
-                  <p className="text-xl font-bold text-(--red)">Processing your order...</p>
-                  <p className="text-(--red)/60">Please do not close this window</p>
+                  <p className="text-xl font-bold text-(--red)">
+                    Processing your order...
+                  </p>
+                  <p className="text-(--red)/60">
+                    Please do not close this window
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -445,13 +617,13 @@ export default function CheckoutPage() {
           {/* Order Summary Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 bg-white rounded-2xl p-6 border-2 border-(--red)/10 space-y-4">
-              <h3 
+              <h3
                 className="text-lg font-bold text-(--red) pb-4 border-b-2 border-(--red)/10"
                 style={{ fontFamily: "var(--font-aboreto)" }}
               >
                 Order Summary
               </h3>
-              
+
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-(--red)/60">
                   <span>Subtotal ({totalItems} items)</span>
@@ -459,7 +631,11 @@ export default function CheckoutPage() {
                 </div>
                 <div className="flex justify-between text-(--red)/60">
                   <span>Delivery</span>
-                  <span>{deliveryFee === 0 ? "Free" : `N${deliveryFee.toLocaleString()}`}</span>
+                  <span>
+                    {deliveryFee === 0
+                      ? "Free"
+                      : `N${deliveryFee.toLocaleString()}`}
+                  </span>
                 </div>
                 {fulfillmentType === "walkin" && (
                   <div className="flex justify-between text-green-600 font-medium">
@@ -472,26 +648,44 @@ export default function CheckoutPage() {
               <div className="pt-4 border-t-2 border-(--red)/10">
                 <div className="flex justify-between items-center">
                   <span className="font-bold text-(--red)">Total</span>
-                  <span 
+                  <span
                     className="text-2xl font-bold text-(--red)"
                     style={{ fontFamily: "var(--font-aboreto)" }}
                   >
-                    N{(fulfillmentType === "walkin" ? total - 1 : total).toLocaleString()}
+                    N
+                    {(fulfillmentType === "walkin"
+                      ? total - 1
+                      : total
+                    ).toLocaleString()}
                   </span>
                 </div>
-                <p className="text-xs text-(--red)/40 mt-2">Including VAT where applicable</p>
+                <p className="text-xs text-(--red)/40 mt-2">
+                  Including VAT where applicable
+                </p>
               </div>
 
               {fulfillmentType && (
                 <div className="pt-4 border-t-2 border-(--red)/10 space-y-2">
                   <div className="flex items-center gap-2 text-sm text-(--red)/60">
-                    {fulfillmentType === "walkin" ? <Store size={16} /> : <Truck size={16} />}
-                    <span className="capitalize">{fulfillmentType === "walkin" ? "Walk-in Pickup" : "Home Delivery"}</span>
+                    {fulfillmentType === "walkin" ? (
+                      <Store size={16} />
+                    ) : (
+                      <Truck size={16} />
+                    )}
+                    <span className="capitalize">
+                      {fulfillmentType === "walkin"
+                        ? "Walk-in Pickup"
+                        : "Home Delivery"}
+                    </span>
                   </div>
                   {paymentMethod && (
                     <div className="flex items-center gap-2 text-sm text-(--red)/60">
                       <CreditCard size={16} />
-                      <span className="capitalize">{paymentMethod === "paystack" ? "Paystack" : "Bank Transfer"}</span>
+                      <span className="capitalize">
+                        {paymentMethod === "paystack"
+                          ? "Paystack"
+                          : "Bank Transfer"}
+                      </span>
                     </div>
                   )}
                 </div>

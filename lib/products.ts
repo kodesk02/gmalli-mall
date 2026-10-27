@@ -1,15 +1,23 @@
-export type Product = {
+export interface Product {
   id: string;
   name: string;
+  brand: string;
   category: string;
   price: number;
-  brand: string;
-  rating: number;
-  in_stock: boolean;
   image: string;
-  price_range: "Low" | "Mid" | "Sale";
+  in_stock: boolean;
   tags: string[];
-};
+  rating?: string
+  price_range: string;
+}
+
+export interface ProductFilters {
+  category?: string;
+  brand?: string;
+  tag?: string;
+  priceRange?: string;
+  inStock?: boolean;
+}
 
 // export const allProducts: Product[] = [
 //   // Fresh Produce

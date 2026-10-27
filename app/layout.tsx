@@ -5,6 +5,7 @@ import Navbar from "@/components/navigation/Navbar";
 import Footer from "@/components/navigation/Footer";
 import { CartProvider } from "@/context/CartContext";
 import CartDrawer from "@/components/cart/CartDrawer";
+import { QueryProvider } from "@/components/providers/QueryProvider";
 
 const redrose = Red_Rose({
   subsets: ["latin"],
@@ -33,14 +34,16 @@ export default function RootLayout({
       <body
         className={`${redrose.variable} ${aboreto.variable} bg-(--cream) antialiased flex flex-col min-h-screen`}
       >
-        <CartProvider>
-          <Navbar />
-          <div className="flex-1">
-            {children}
-            <CartDrawer />
-          </div>
-          <Footer />
-        </CartProvider>
+        <QueryProvider>
+          <CartProvider>
+            <Navbar />
+            <div className="flex-1">
+              {children}
+              <CartDrawer />
+            </div>
+            <Footer />
+          </CartProvider>
+        </QueryProvider>
       </body>
     </html>
   );

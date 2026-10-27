@@ -1,117 +1,152 @@
 "use client";
+"use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import {
-  ArrowLeft,
-  Check,
-  //  Star, ShoppingCart,
-  PackageX,
-  ShoppingCart,
-  Star,
-} from "lucide-react";
+import { ArrowLeft, Check, PackageX, ShoppingCart, Star } from "lucide-react";
 import CategoryFilter, {
   FilterState,
 } from "@/components/page_components/CategoryFilter";
-import { Product } from "@/lib/products";
 import { useCart } from "@/context/CartContext";
+import { useProducts, useProductFilters } from "@/hooks/useProducts";
+import type { Product } from "@/lib/products";
 
-// const priceRangeOrder = { Low: 1, Mid: 2, Sale: 3 };
+const EMPTY_FILTER_OPTIONS = { brands: [], tags: [], priceRanges: [] };
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.07, delayChildren: 0.1 },
+  },
+};
+
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 30, scale: 0.95 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.4, ease: "easeOut" },
+  },
+  exit: { opacity: 0, scale: 0.9, transition: { duration: 0.2 } },
+};
+
+function ProductGridSkeleton() {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6">
+      {Array.from({ length: 8 }).map((_, i) => (
+        <div
+          key={i}
+          className="aspect-3/4 rounded-2xl bg-(--red)/10 animate-pulse"
+        />
+      ))}
+    </div>
+  );
+}
 
 export default function CategoryPage() {
   const params = useParams();
   const router = useRouter();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const rawCategory = params?.category as string;
-  const category = decodeURIComponent(rawCategory ?? "");
+
+  const category = decodeURIComponent((params?.category as string) ?? "");
+
   const [activeFilters, setActiveFilters] = useState<FilterState>({
     brands: [],
     tags: [],
     priceRanges: [],
     inStockOnly: false,
   });
-  const [filterOptions, setFilterOptions] = useState<{
-    brands: string[];
-    tags: string[];
-    priceRanges: string[];
-  }>({
-    brands: [],
-    tags: [],
-    priceRanges: [],
-  });
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setLoading(true);
+  const {
+    data: products = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useProducts({ category, inStock: activeFilters.inStockOnly });
 
-      const params = new URLSearchParams();
-      params.set("category", category);
+  const { data: filterOptions = EMPTY_FILTER_OPTIONS } =
+    useProductFilters(category);
 
-      if (activeFilters.brands.length === 1) {
-        params.set("brand", activeFilters.brands[0]);
-      }
-      if (activeFilters.tags.length === 1) {
-        params.set("tag", activeFilters.tags[0]);
-      }
-      if (activeFilters.priceRanges.length === 1) {
-        params.set("priceRange", activeFilters.priceRanges[0]);
-      }
-      if (activeFilters.inStockOnly) {
-        params.set("inStock", "true");
-      }
+  const filteredProducts = useMemo(() => {
+    const { brands, tags, priceRanges } = activeFilters;
 
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/products?${params.toString()}`,
+    return products.filter(
+      (p) =>
+        (brands.length === 0 || brands.includes(p.brand)) &&
+        (tags.length === 0 || tags.some((t) => p.tags.includes(t))) &&
+        (priceRanges.length === 0 || priceRanges.includes(p.price_range)),
+    );
+  }, [products, activeFilters]);
+
+  const renderContent = () => {
+    if (isLoading) {
+      return <ProductGridSkeleton />;
+    }
+
+    if (isError) {
+      return (
+        <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+          <PackageX size={64} className="text-(--red)/30" />
+          <h2
+            className="text-2xl font-bold text-(--red)/50"
+            style={{ fontFamily: "var(--font-aboreto)" }}
+          >
+            Couldn&apos;t load products
+          </h2>
+          <button
+            onClick={() => refetch()}
+            className="px-5 py-2 rounded-xl bg-(--red) text-(--cream) font-semibold cursor-pointer"
+          >
+            Try again
+          </button>
+        </div>
       );
-      const data = await res.json();
-      setProducts(data);
-      setLoading(false);
-    };
+    }
 
-    fetchProducts();
-  }, [category, activeFilters]);
-
-  useEffect(() => {
-    const fetchFilterOptions = async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/products/filters?category=${encodeURIComponent(category)}`,
+    if (filteredProducts.length === 0) {
+      return (
+        <motion.div
+          key="empty"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center justify-center py-24 gap-4 text-center"
+        >
+          <PackageX size={64} className="text-(--red)/30" />
+          <h2
+            className="text-2xl font-bold text-(--red)/50"
+            style={{ fontFamily: "var(--font-aboreto)" }}
+          >
+            No products found
+          </h2>
+          <p className="text-(--red)/40 max-w-xs">
+            Try adjusting your filters to see more results.
+          </p>
+        </motion.div>
       );
-      const data = await res.json();
-      setFilterOptions(data);
-    };
+    }
 
-    fetchFilterOptions();
-  }, [category]);
-
-const filteredProducts = useMemo(
-  () => (Array.isArray(products) ? products : []),
-  [products]
-);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.07, delayChildren: 0.1 },
-    },
-  };
-
-  const cardVariants: Variants = {
-    hidden: { opacity: 0, y: 30, scale: 0.95 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: { duration: 0.4, ease: "easeOut" },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.9,
-      transition: { duration: 0.2 },
-    },
+    return (
+      <motion.div
+        key="grid"
+        className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 md:gap-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <AnimatePresence>
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              variants={cardVariants}
+            />
+          ))}
+        </AnimatePresence>
+      </motion.div>
+    );
   };
 
   return (
@@ -143,10 +178,12 @@ const filteredProducts = useMemo(
               >
                 {category}
               </h1>
-              <p className="text-sm text-(--red)/60 mt-0.5">
-                {filteredProducts.length} of {products.length} product
-                {products.length !== 1 ? "s" : ""}
-              </p>
+              {!isLoading && !isError && (
+                <p className="text-sm text-(--red)/60 mt-0.5">
+                  {filteredProducts.length} of {products.length} product
+                  {products.length !== 1 ? "s" : ""}
+                </p>
+              )}{" "}
             </div>
           </div>
 
@@ -161,46 +198,7 @@ const filteredProducts = useMemo(
 
       {/* Product Grid */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 py-8">
-        <AnimatePresence mode="wait">
-          {filteredProducts.length === 0 ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center py-24 gap-4 text-center"
-            >
-              <PackageX size={64} className="text-(--red)/30" />
-              <h2
-                className="text-2xl font-bold text-(--red)/50"
-                style={{ fontFamily: "var(--font-aboreto)" }}
-              >
-                No products found
-              </h2>
-              <p className="text-(--red)/40 max-w-xs">
-                Try adjusting your filters to see more results.
-              </p>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="grid"
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-4 md:gap-6"
-              variants={containerVariants}
-              initial="hidden"
-              animate="visible"
-            >
-              <AnimatePresence>
-                {filteredProducts.map((product) => (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    variants={cardVariants}
-                  />
-                ))}
-              </AnimatePresence>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {renderContent()}
       </div>
     </div>
   );
